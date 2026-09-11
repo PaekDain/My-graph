@@ -1,3 +1,9 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go  # 구역 3에서 go.Scatter를 쓸 때 필수!
+
+
 # -----------------------------------------------------------------------------
 # 구역 3: 날짜별 TOP 10 총 관객 수 변화 (영역 그래프)
 # -----------------------------------------------------------------------------
