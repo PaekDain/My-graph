@@ -1,3 +1,9 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+
 # -----------------------------------------------------------------------------
 # 구역 4: 기간 내 합계 관객 수 TOP 10 영화 (가로 막대그래프)
 # -----------------------------------------------------------------------------
