@@ -166,21 +166,18 @@ st.markdown("---")
 # -----------------------------------------------------------------------------
 st.header("📌 구역 4: 기간 내 관객 수 TOP 10 영화")
 
-# 기준 선택 옵션 (라디오 버튼)
 metric_option = st.radio(
     "집계 기준을 선택하세요:",
     options=["기간 내 일관객 합계", "최종 누적관객 수"],
     horizontal=True
 )
 
-# 영화별 데이터 집계
 top10_movies_summary = df.groupby('영화명').agg(
     일관객합계=('일관객', 'sum'),
     누적관객수=('누적관객', 'max'),
     진입일수=('날짜', 'nunique')
 ).reset_index()
 
-# 선택한 기준에 따라 정렬 및 칼럼 지정
 if metric_option == "기간 내 일관객 합계":
     target_col = '일관객합계'
     chart_title = "기간 내 일관객 합계 TOP 10 영화"
@@ -188,7 +185,6 @@ else:
     target_col = '누적관객수'
     chart_title = "최종 누적관객 수 TOP 10 영화"
 
-# 상위 10개 영화 추출 (가로 막대 상단에 1위가 오도록 오름차순 정렬)
 top10_movies_summary = top10_movies_summary.nlargest(10, target_col).sort_values(target_col, ascending=True)
 
 fig4 = px.bar(
@@ -225,3 +221,64 @@ fig4.update_layout(
 st.plotly_chart(fig4, use_container_width=True)
 
 st.info("💡 **이 그래프로 알 수 있는 것:** 해당 데이터 집계 기간 동안 기록한 관객 수와 실제 영화의 전체 누적관객 수를 비교하여, 상영 기간 전체 흥행 규모와 특정 기간 차트인 성과 간의 차이를 분석할 수 있습니다.")
+
+st.markdown("---")
+
+# -----------------------------------------------------------------------------
+# 구역 5: 월×요일별 일관객 합계 (히트맵)
+# -----------------------------------------------------------------------------
+st.header("📌 구역 5: 월×요일별 관객 수 분포")
+
+# 데이터 카피 후 월, 요일 추출
+heatmap_df = df.copy()
+heatmap_df['월'] = heatmap_df['날짜'].dt.month.astype(str) + "월"
+heatmap_df['요일'] = heatmap_df['날짜'].dt.day_name()
+
+# 요일 한글 변환 및 정렬 순서 정의 (월요일 -> 일요일)
+day_map = {
+    'Monday': '월요일',
+    'Tuesday': '화요일',
+    'Wednesday': '수요일',
+    'Thursday': '목요일',
+    'Friday': '금요일',
+    'Saturday': '토요일',
+    'Sunday': '일요일'
+}
+heatmap_df['요일'] = heatmap_df['요일'].map(day_map)
+
+days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
+months_order = [f"{i}월" for i in range(1, 13)]
+
+# 월 x 요일별 일관객 합계 피벗 테이블 생성
+pivot_df = heatmap_df.pivot_table(
+    index='월',
+    columns='요일',
+    values='일관객',
+    aggfunc='sum'
+).reindex(index=months_order, columns=days_order).fillna(0)
+
+# Plotly 히트맵 생성
+fig5 = px.imshow(
+    pivot_df,
+    labels=dict(x="요일", y="월", color="일관객 합계"),
+    x=days_order,
+    y=months_order,
+    color_continuous_scale="Reds",
+    aspect="auto",
+    title="월 및 요일별 일관객 합계 히트맵"
+)
+
+fig5.update_traces(
+    hovertemplate="<b>%{y} %{x}</b><br>일관객 합계: %{z:,}명<extra></extra>"
+)
+
+fig5.update_layout(
+    xaxis_title="요일",
+    yaxis_title="월",
+    margin=dict(l=20, r=20, t=50, b=20),
+    height=500
+)
+
+st.plotly_chart(fig5, use_container_width=True)
+
+st.info("💡 **이 그래프로 알 수 있는 것:** 월별/요일별로 극장 관객이 어느 시점에 가장 밀집되는지 패턴을 한눈에 파악할 수 있으며, 성수기 주말과 비수기 평일 간의 관객 수 격차를 직관적으로 확인할 수 있습니다.")
