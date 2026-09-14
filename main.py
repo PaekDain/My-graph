@@ -101,10 +101,46 @@ if st.button("💾 구역 1 메모 저장", key="btn_1"):
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 구역 2: 추후 추가될 그래프 구역
+# 구역 2: 주요 TOP 5 흥행작 동시 관객 수 비교 (다중 선 그래프)
 # -----------------------------------------------------------------------------
-st.header("📌 구역 2: 주요 영화 동시 관객 비교 (추가 예정)")
-st.caption("※ 향후 기간별 주요 흥행작들의 동시 관객 수 비교 그래프가 들어갈 자리입니다.")
+st.header("📌 구역 2: 주요 TOP 5 흥행작 동시 관객 수 비교")
+
+# 일관객 합계 기준 상위 5개 영화 추출
+top5_movies = df.groupby('영화명')['일관객'].sum().nlargest(5).index.tolist()
+top5_df = df[df['영화명'].isin(top5_movies)].sort_values('날짜')
+
+# TOP 5 다중 선 그래프 생성
+fig2 = px.line(
+    top5_df,
+    x='날짜',
+    y='일관객',
+    color='영화명',
+    title="기간 내 일관객 TOP 5 영화 날짜별 추이 비교",
+    labels={'날짜': '날짜', '일관객': '일일 관객 수(명)', '영화명': '영화 제목'}
+)
+
+fig2.update_traces(
+    mode='lines+markers',
+    hovertemplate="<b>영화명:</b> %{fullData.name}<br><b>날짜:</b> %{x|%Y-%m-%d}<br><b>일관객:</b> %{y:,}명<extra></extra>"
+)
+
+fig2.update_layout(
+    xaxis_title="날짜",
+    yaxis_title="일일 관객 수 (명)",
+    hovermode="x unified",
+    legend=dict(
+        title="영화 제목 (클릭하여 켜기/끄기)",
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ),
+    margin=dict(l=20, r=20, t=60, b=20),
+    height=500
+)
+
+st.plotly_chart(fig2, use_container_width=True)
 
 # 사용자 입력 메모 저장 구조 (구역 2)
 if 'note_2' not in st.session_state:
