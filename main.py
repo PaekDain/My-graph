@@ -89,7 +89,14 @@ if not movie_df.empty:
 else:
     st.warning("선택한 영화의 데이터가 없습니다.")
 
-st.info(f"💡 **이 그래프로 알 수 있는 것:** {selected_movie}의 상영 기간 동안 일일 관객 수가 주말과 평일에 어떻게 변동하는지, 그리고 최고 전성기(피크) 이후 흥행 감소 추세를 시각적으로 확인할 수 있습니다.")
+# 사용자 입력 메모 저장 구조 (구역 1)
+if 'note_1' not in st.session_state:
+    st.session_state.note_1 = ""
+
+user_input_1 = st.text_area("💡 이 그래프로 알 수 있는 것 (직접 입력):", value=st.session_state.note_1, key="input_1", placeholder="그래프를 보고 발견한 인사이트를 기록하세요...")
+if st.button("💾 구역 1 메모 저장", key="btn_1"):
+    st.session_state.note_1 = user_input_1
+    st.success("구역 1 인사이트 메모가 저장되었습니다!")
 
 st.markdown("---")
 
@@ -99,7 +106,14 @@ st.markdown("---")
 st.header("📌 구역 2: 주요 영화 동시 관객 비교 (추가 예정)")
 st.caption("※ 향후 기간별 주요 흥행작들의 동시 관객 수 비교 그래프가 들어갈 자리입니다.")
 
-st.info("💡 **이 그래프로 알 수 있는 것:** 특정 시점에 경쟁하는 여러 영화 간의 점유율 변화 및 경쟁 양상을 알 수 있습니다.")
+# 사용자 입력 메모 저장 구조 (구역 2)
+if 'note_2' not in st.session_state:
+    st.session_state.note_2 = ""
+
+user_input_2 = st.text_area("💡 이 그래프로 알 수 있는 것 (직접 입력):", value=st.session_state.note_2, key="input_2", placeholder="그래프를 보고 발견한 인사이트를 기록하세요...")
+if st.button("💾 구역 2 메모 저장", key="btn_2"):
+    st.session_state.note_2 = user_input_2
+    st.success("구역 2 인사이트 메모가 저장되었습니다!")
 
 st.markdown("---")
 
@@ -157,7 +171,14 @@ for idx, (_, row) in enumerate(top3_days.sort_values('일관객', ascending=Fals
         value=f"{row['일관객']:,} 명"
     )
 
-st.info("💡 **이 그래프로 알 수 있는 것:** 1년 중 극장가 전체 관객이 가장 몰린 성수기(명절, 연휴, 여름/겨울 방학 등) 날짜와 연중 극장 시장 규모의 변동 패턴을 알 수 있습니다.")
+# 사용자 입력 메모 저장 구조 (구역 3)
+if 'note_3' not in st.session_state:
+    st.session_state.note_3 = ""
+
+user_input_3 = st.text_area("💡 이 그래프로 알 수 있는 것 (직접 입력):", value=st.session_state.note_3, key="input_3", placeholder="그래프를 보고 발견한 인사이트를 기록하세요...")
+if st.button("💾 구역 3 메모 저장", key="btn_3"):
+    st.session_state.note_3 = user_input_3
+    st.success("구역 3 인사이트 메모가 저장되었습니다!")
 
 st.markdown("---")
 
@@ -220,7 +241,14 @@ fig4.update_layout(
 
 st.plotly_chart(fig4, use_container_width=True)
 
-st.info("💡 **이 그래프로 알 수 있는 것:** 해당 데이터 집계 기간 동안 기록한 관객 수와 실제 영화의 전체 누적관객 수를 비교하여, 상영 기간 전체 흥행 규모와 특정 기간 차트인 성과 간의 차이를 분석할 수 있습니다.")
+# 사용자 입력 메모 저장 구조 (구역 4)
+if 'note_4' not in st.session_state:
+    st.session_state.note_4 = ""
+
+user_input_4 = st.text_area("💡 이 그래프로 알 수 있는 것 (직접 입력):", value=st.session_state.note_4, key="input_4", placeholder="그래프를 보고 발견한 인사이트를 기록하세요...")
+if st.button("💾 구역 4 메모 저장", key="btn_4"):
+    st.session_state.note_4 = user_input_4
+    st.success("구역 4 인사이트 메모가 저장되었습니다!")
 
 st.markdown("---")
 
@@ -229,12 +257,10 @@ st.markdown("---")
 # -----------------------------------------------------------------------------
 st.header("📌 구역 5: 월×요일별 관객 수 분포")
 
-# 데이터 카피 후 월, 요일 추출
 heatmap_df = df.copy()
 heatmap_df['월'] = heatmap_df['날짜'].dt.month.astype(str) + "월"
 heatmap_df['요일'] = heatmap_df['날짜'].dt.day_name()
 
-# 요일 한글 변환 및 정렬 순서 정의 (월요일 -> 일요일)
 day_map = {
     'Monday': '월요일',
     'Tuesday': '화요일',
@@ -249,7 +275,6 @@ heatmap_df['요일'] = heatmap_df['요일'].map(day_map)
 days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
 months_order = [f"{i}월" for i in range(1, 13)]
 
-# 월 x 요일별 일관객 합계 피벗 테이블 생성
 pivot_df = heatmap_df.pivot_table(
     index='월',
     columns='요일',
@@ -257,7 +282,6 @@ pivot_df = heatmap_df.pivot_table(
     aggfunc='sum'
 ).reindex(index=months_order, columns=days_order).fillna(0)
 
-# Plotly 히트맵 생성
 fig5 = px.imshow(
     pivot_df,
     labels=dict(x="요일", y="월", color="일관객 합계"),
@@ -281,4 +305,11 @@ fig5.update_layout(
 
 st.plotly_chart(fig5, use_container_width=True)
 
-st.info("💡 **이 그래프로 알 수 있는 것:** 월별/요일별로 극장 관객이 어느 시점에 가장 밀집되는지 패턴을 한눈에 파악할 수 있으며, 성수기 주말과 비수기 평일 간의 관객 수 격차를 직관적으로 확인할 수 있습니다.")
+# 사용자 입력 메모 저장 구조 (구역 5)
+if 'note_5' not in st.session_state:
+    st.session_state.note_5 = ""
+
+user_input_5 = st.text_area("💡 이 그래프로 알 수 있는 것 (직접 입력):", value=st.session_state.note_5, key="input_5", placeholder="그래프를 보고 발견한 인사이트를 기록하세요...")
+if st.button("💾 구역 5 메모 저장", key="btn_5"):
+    st.session_state.note_5 = user_input_5
+    st.success("구역 5 인사이트 메모가 저장되었습니다!")
